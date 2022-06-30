@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "mongodb": "^4.7.0",
-    "netlify-cli": "^10.6.3"
+    "netlify-cli": "^10.6.3",
+    "nodemailer": "^6.7.6"
   }
 }
