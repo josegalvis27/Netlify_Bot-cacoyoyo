@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
                     html: text,
                     //html: message2
                 }
-                smtpTransport.sendMail(mailOptions);
+                await smtpTransport.sendMail(mailOptions);
             
             return {
                 statusCode: 200,
