@@ -15,8 +15,8 @@ exports.handler = async (event, context) => {
                 {
                     service: "Gmail",
                     auth: {
-                        user: "jgalvis414@gmail.com",
-                        pass: "kyoeqjknpkcmmfof"
+                        user: "todomarketbot@gmail.com",
+                        pass: "jqebfcuitkvvuiqh"
                     }
                 });
             var mailOptions = {
