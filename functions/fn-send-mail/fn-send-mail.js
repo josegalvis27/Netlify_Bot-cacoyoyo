@@ -1,6 +1,4 @@
 const nodemailer = require('nodemailer')
-const connectDB = require("../../config/database");
-
 exports.handler = async (event, context) => {
 
     let { httpMethod: method, body } = event;
