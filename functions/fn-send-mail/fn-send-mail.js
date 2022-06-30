@@ -1,11 +1,11 @@
-const nodemailer = require('nodemailer')
+const nodemailer = require ('nodemailer')
+
 exports.handler = async (event, context) => {
-
-    let { httpMethod: method, body } = event;
-
-    if (method == 'POST') {
-        try {
+    let { httpMethod: method, body} = event;
+    if (method == 'POST') { 
+        try {//console.log(JSON.parse(event.body))
             let newBody = JSON.parse(event.body)
+           // console.log(newBody)
             let name = newBody.name;
             let from = newBody.from;
             let to = newBody.to;
@@ -16,21 +16,23 @@ exports.handler = async (event, context) => {
                     service: "Gmail",
                     auth: {
                         user: "todomarketbot@gmail.com",
-                        pass: "jqebfcuitkvvuiqh"
+                        pass: "znplaozomwazbydh"
                     }
                 });
-            var mailOptions = {
-                from: from,
-                to: to,
-                subject: name + ' | Aqui esta tu factura | ',
-                html: text,
-                //html: message2
-            }
-            smtpTransport.sendMail(mailOptions);
-
+                var mailOptions = {
+                    from: from,
+                    to: to, 
+                    subject: name+' | Aqui esta tu factura | ',
+                    html: text,
+                    //html: message2
+                }
+                smtpTransport.sendMail(mailOptions);
+            
             return {
                 statusCode: 200,
+                
             }
+
         } catch (error) {
             return { statusCode: 500, body: error.toString() }
         }
