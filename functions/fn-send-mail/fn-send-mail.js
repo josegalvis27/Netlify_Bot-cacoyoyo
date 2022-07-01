@@ -13,7 +13,10 @@ exports.handler = async (event, context) => {
 
             var smtpTransport = nodemailer.createTransport(
                 {
-                    service: "Gmail",
+                    //service: "Gmail",
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
                     auth: {
                         user: "todomarketbot@gmail.com",
                         pass: "znplaozomwazbydh"
