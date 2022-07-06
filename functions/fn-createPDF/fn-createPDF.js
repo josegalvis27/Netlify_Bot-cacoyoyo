@@ -195,9 +195,6 @@ exports.handler = async (event, context) => {
                 return year + "/" + month + "/" + day;
             }
 
-            let newBody = JSON.parse(event.body)
-            console.log(newBody)
-
             return {
                 statusCode: 200,
 
