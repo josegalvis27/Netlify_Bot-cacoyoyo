@@ -1,6 +1,7 @@
 let connectDB = require("../../database/database");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
+const path = require('path')
 exports.handler = async (event, context) => {
     let {
         httpMethod: method,
@@ -10,9 +11,9 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
             console.log(newBody1)
-            let path = path.solve('./utils/invoice.pdf')
+            let path2 = path.resolve('./utils/invoice.pdf')
 
-            createInvoice(newBody1, path)
+            createInvoice(newBody1, path2)
             
             function createInvoice(invoice, path) {
                 let doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -27,7 +28,7 @@ exports.handler = async (event, context) => {
             }
 
             function generateHeader(doc) {
-                let pathLogo = path.solve('./utils/logo.png')
+                let pathLogo = path.resolve('./utils/logo.png')
                 doc
                     .image(pathLogo, 50, 45, { width: 50 })
                     .fillColor("#444444")
