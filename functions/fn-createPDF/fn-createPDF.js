@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
 
             createInvoice(newBody1, path2)
             
-            function createInvoice(invoice, path) {
+            async function  createInvoice(invoice, path) {
                 let doc = new PDFDocument({ size: "A4", margin: 50 });
 
                // generateHeader(doc);
