@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
             console.log(newBody1)
-            let path2 = 'https://raw.githubusercontent.com/jgalvis414/Netlify_Bot/master/utils/invoice.pdf'
+            let path2 = path.resolve('./utils/invoice.pdf')
 
             createInvoice(newBody1, path2)
             
@@ -28,7 +28,7 @@ exports.handler = async (event, context) => {
             }
 
             function generateHeader(doc) {
-                let pathLogo = 'https://raw.githubusercontent.com/jgalvis414/Netlify_Bot/master/utils/logo.png'
+                let pathLogo = 'https://www.adslzone.net/app/uploads-adslzone.net/2019/04/borrar-fondo-imagen.jpg'
                 doc
                     .image(pathLogo, 50, 45, { width: 50 })
                     .fillColor("#444444")
