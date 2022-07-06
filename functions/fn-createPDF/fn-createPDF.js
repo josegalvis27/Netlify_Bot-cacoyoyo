@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
             console.log(newBody1)
-            let path2 = path.resolve('./utils/invoice.pdf')
+            let path2 = path.resolve('./utils/invoice2.pdf')
 
             createInvoice(newBody1, path2)
             
