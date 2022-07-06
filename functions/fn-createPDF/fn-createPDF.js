@@ -10,7 +10,8 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
             console.log(newBody1)
-            createInvoice(newBody1, 'invoice.pdf')
+            path = path.solve('./utils/invoice.pdf')
+            createInvoice(newBody1, path)
             function createInvoice(invoice, path) {
                 let doc = new PDFDocument({ size: "A4", margin: 50 });
 
@@ -24,7 +25,7 @@ exports.handler = async (event, context) => {
             }
 
             function generateHeader(doc) {
-                let pathLogo = path.solve('logo.png')
+                let pathLogo = path.solve('./utils/logo.png')
                 doc
                     .image(pathLogo, 50, 45, { width: 50 })
                     .fillColor("#444444")
