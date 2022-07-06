@@ -10,8 +10,10 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
             console.log(newBody1)
-            path = path.solve('./utils/invoice.pdf')
+            let path = path.solve('./utils/invoice.pdf')
+
             createInvoice(newBody1, path)
+            
             function createInvoice(invoice, path) {
                 let doc = new PDFDocument({ size: "A4", margin: 50 });
 
