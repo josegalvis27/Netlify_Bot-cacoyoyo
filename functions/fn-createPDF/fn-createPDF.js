@@ -2,7 +2,22 @@ let connectDB = require("../../database/database");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
 const path = require('path')
+const nodemailer = require("nodemailer");
+const mg = require("nodemailer-mailgun-transport");
+
+var transporter = nodemailer.createTransport(
+    {
+        //service: "Gmail",
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: "todomarketbot@gmail.com",
+            pass: "znplaozomwazbydh"
+        }
+    });
 exports.handler = async (event, context) => {
+    const { email  } = JSON.parse(event.body);
     let {
         httpMethod: method,
         body
@@ -25,6 +40,27 @@ exports.handler = async (event, context) => {
 
                 doc.end();
                 doc.pipe(fs.createWriteStream(path));
+
+                const info = await transporter.sendMail({
+                    from: process.env.MAILGUN_SENDER,
+                    to: email,
+                    subject: "Your report is ready!",
+                    text: "See attached report PDF",
+                    attachments: [
+                      {
+                        filename: `report-${new Date().toDateString()}.pdf`,
+                        content: doc,
+                        contentType: "application/pdf",
+                      },
+                    ],
+                  });
+                  console.log(`PDF report sent: ${info.messageId}`);
+
+
+
+
+
+
             }
 
             function generateHeader(doc) {
