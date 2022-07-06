@@ -28,6 +28,10 @@ exports.handler = async (event, context) => {
                     subject: name+' | Aqui esta tu factura | ',
                     html: text,
                     //html: message2
+                    attachments : [{
+                       // filename: 'invoice.pdf',
+                        path: 'invoice.pdf'
+                    }]
                 }
                 await smtpTransport.sendMail(mailOptions);
             
