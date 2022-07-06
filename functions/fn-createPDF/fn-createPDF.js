@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport(
         }
     });
 exports.handler = async (event, context) => {
-    const { shipping, items  } = JSON.parse(event.body);
+    const { shipping, items } = JSON.parse(event.body);
     let {
         httpMethod: method,
         body
@@ -25,15 +25,15 @@ exports.handler = async (event, context) => {
     if (method == 'PUT') {
         try {
             let newBody1 = JSON.parse(event.body)
-            
+
             let path2 = path.resolve('./utils/invoice.pdf')
 
             createInvoice(newBody1, path2)
-            
-            async function  createInvoice(invoice, path) {
-                let doc = new PDFDocument({ size: "A4", margin: 50 });
 
-               generateHeader(doc);
+            async function createInvoice(invoice, path) {
+                let doc = Buffer.from(new PDFDocument({ size: "A4", margin: 50 }));
+
+                //generateHeader(doc);
                 generateCustomerInformation(doc, invoice);
                 generateInvoiceTable(doc, invoice);
                 generateFooter(doc);
@@ -43,18 +43,18 @@ exports.handler = async (event, context) => {
 
                 const info = await transporter.sendMail({
                     from: process.env.MAILGUN_SENDER,
-                    to: shipping.email,
+                    to: invoice.shipping.email,
                     subject: "Your report is ready!",
                     text: "See attached report PDF",
                     attachments: [
-                      {
-                        filename: `report-${new Date().toDateString()}.pdf`,
-                        content: doc,
-                        contentType: "application/pdf",
-                      },
+                        {
+                            filename: `report-${new Date().toDateString()}.pdf`,
+                            content: doc,
+                            contentType: "application/pdf",
+                        },
                     ],
-                  });
-                  console.log(`PDF report sent: ${info.messageId}`);
+                });
+                console.log(`PDF report sent: ${info.messageId}`);
 
 
 
