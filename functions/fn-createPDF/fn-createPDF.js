@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport(
         }
     });
 exports.handler = async (event, context) => {
-    const { email  } = JSON.parse(event.body);
+    const { shipping  } = JSON.parse(event.body);
     let {
         httpMethod: method,
         body
@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
 
                 const info = await transporter.sendMail({
                     from: process.env.MAILGUN_SENDER,
-                    to: email,
+                    to: shipping.email,
                     subject: "Your report is ready!",
                     text: "See attached report PDF",
                     attachments: [
