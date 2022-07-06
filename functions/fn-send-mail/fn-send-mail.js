@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
                     html: text,
                     //html: message2
                     attachments : [{
-                       // filename: 'invoice.pdf',
+                       filename: 'invoice.pdf',
                         path: 'invoice.pdf'
                     }]
                 }
