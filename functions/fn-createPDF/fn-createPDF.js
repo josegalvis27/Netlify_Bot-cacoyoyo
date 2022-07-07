@@ -6,7 +6,7 @@ var transporter = nodemailer.createTransport(
     {
         //service: "Gmail",
         host: 'smtp.gmail.com',
-        port: 587,
+        port: 465,
         secure: false,
         auth: {
             user: "todomarketbot@gmail.com",
