@@ -23,7 +23,6 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
 
-
             createInvoice(newBody1)
 
             function generateLinesProducts(items) {
