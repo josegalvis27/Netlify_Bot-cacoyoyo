@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
                 return [aux, aux2, aux3, aux4, aux5]
 
             }
-            async function createInvoice(invoice, path) {
+            async function createInvoice(invoice) {
 
                 let auxiliares = generateLinesProducts(invoice.items)
                 let name = invoice.shipping.name
