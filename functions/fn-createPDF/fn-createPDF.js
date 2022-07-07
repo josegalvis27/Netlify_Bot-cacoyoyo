@@ -1,9 +1,6 @@
-let connectDB = require("../../database/database");
-const fs = require("fs");
-const PDFDocument = require("pdfkit");
-const path = require('path')
 const nodemailer = require("nodemailer");
 const mg = require("nodemailer-mailgun-transport");
+const { jsPDF } = require("jspdf");
 
 var transporter = nodemailer.createTransport(
     {
@@ -27,221 +24,88 @@ exports.handler = async (event, context) => {
             let newBody1 = JSON.parse(event.body)
 
             let path2 = path.resolve('./utils/invoice.pdf')
-
             createInvoice(newBody1, path2)
 
+            function generateLinesProducts(items) {
+                let i = 0, len = items.length, line = '', aux = [], aux2 = [], aux3 = [], aux4 = [], aux5 = []
+                for (; i < len; i++) {
+                    aux.push(`${items[i].item}`)
+                    aux2.push(items[i].description)
+                    aux3.push(`${items[i].quantity}`)
+                    aux4.push(`$${items[i].amount}`)
+                    aux5.push(`$${items[i].priceUnit}`)
+
+                }
+                return [aux, aux2, aux3, aux4, aux5]
+
+            }
             async function createInvoice(invoice, path) {
-                let doc = Buffer.from(new PDFDocument({ size: "A4", margin: 50 }));
 
-                //generateHeader(doc);
-                generateCustomerInformation(doc, invoice);
-                generateInvoiceTable(doc, invoice);
-                generateFooter(doc);
+                let auxiliares = generateLinesProducts(invoice.items)
+                let name = invoice.shipping.name
+                let email = invoice.shipping.email
+                let address = invoice.shipping.address
+                let total = invoice.total
+                let html = invoice.html
+                const tiempoTranscurrido = Date.now();
+                const hoy = new Date(tiempoTranscurrido);
 
-                doc.end();
-                doc.pipe(fs.createWriteStream(path));
+
+
+                let doc = (new jsPDF()
+                    .setFont("courier")
+                    .setFontSize(20)
+                    .text(['TODO MARKET. C.A'], 10, 25)
+                    .setFontSize(10)
+                    .text(["AV. FRANCISCO DE MIRANDA", 'Caracas, 10300'], 180, 25, { align: 'right' })
+                    .setFontSize(20)
+                    .text('Recibo generado', 10, 40)
+                    .line(10, 44, 200, 44)
+                    .setFontSize(10)
+                    .text([`Fecha: ${hoy.toLocaleDateString()}`, `Monto: $${total.toFixed(2)}`], 20, 50)
+                    .text([`Cliente: ${name}`, `Dirección: ${address}`, `Correo: ${email}`], 70, 50)
+                    .line(10, 72, 200, 72)
+                    .text('Item', 10, 78)
+                    .text('Artículo', 50, 78)
+                    .text('Cantidad', 95, 78)
+                    .text('precio UNIT.', 115, 78)
+                    .text('SubTotal', 150, 78)
+                    .line(10, 80, 200, 80)
+                    .text(auxiliares[0], 10, 90, { lineHeightFactor: 1.70 })
+                    .text(auxiliares[1], 50, 90, { lineHeightFactor: 1.70 })
+                    .text(auxiliares[2], 100, 90, { lineHeightFactor: 1.70 })
+                    .text(auxiliares[4], 120, 90, { lineHeightFactor: 1.70 })
+                    .text(auxiliares[3], 150, 90, { lineHeightFactor: 1.70 })
+                    .line(10, 210, 200, 210)
+                    .setFontSize(15)
+                    .text(`Total: $${total.toFixed(2)}`, 100, 240)
+                    .setFontSize(10)
+                    .text(`Recibo generado a través de TODO MARKET BOT en telegram`,50,280)
+
+
+                )
+
+                doc = Buffer.from(doc.output('arraybuffer'))
+             
 
                 const info = await transporter.sendMail({
                     from: process.env.MAILGUN_SENDER,
                     to: invoice.shipping.email,
-                    subject: "Your report is ready!",
-                    text: "See attached report PDF",
+                    subject: "Recibimos tu compra!",
+                   // text: 'Aca esta tu factura',
+                    html: html,
                     attachments: [
                         {
-                            filename: `report-${new Date().toDateString()}.pdf`,
+                            filename: `recibo-${name}-${hoy.toLocaleDateString()}.pdf`,
                             content: doc,
                             contentType: "application/pdf",
                         },
                     ],
                 });
-                console.log(`PDF report sent: ${info.messageId}`);
-
-
-
-
-
-
+               // console.log(`PDF report sent: ${info.messageId}`);
             }
-
-            function generateHeader(doc) {
-                let pathLogo = path.resolve('./utils/invoice2.pdf')
-                doc
-                    .image(pathLogo, 50, 45, { width: 50 })
-                    .fillColor("#444444")
-                    .fontSize(20)
-                    .text("TODO MARKET C.A.", 110, 57)
-                    .fontSize(10)
-                    .text("TODO MARKET C.A", 200, 50, { align: "right" })
-                    .text("AV. FRANCISCO DE MIRANDA", 200, 65, { align: "right" })
-                    .text("Caracas, 10030", 200, 80, { align: "right" })
-                    .moveDown();
-            }
-
-            function generateCustomerInformation(doc, invoice) {
-                doc
-                    .fillColor("#444444")
-                    .fontSize(20)
-                    .text("Recibo generado:", 50, 120);
-                //esta son las lineas:
-                generateHr(doc, 140);
-                const customerInformationTop = 145;
-
-                doc
-                    .fontSize(10)
-                    .text("Invoice Number:", 50, customerInformationTop)
-                    .font("Helvetica-Bold")
-                    .text(invoice.invoice_nr, 150, customerInformationTop)
-                    .font("Helvetica")
-                    .text("Invoice Date:", 50, customerInformationTop + 15)
-                    .text(formatDate(new Date()), 150, customerInformationTop + 15)
-                    .text("Balance Due:", 50, customerInformationTop + 30)
-                    .text(
-                        formatCurrency(invoice.subtotal - invoice.paid),
-                        150,
-                        customerInformationTop + 30
-                    )
-
-                    .font("Helvetica-Bold")
-                    .text(invoice.shipping.name, 300, customerInformationTop)
-                    .font("Helvetica")
-                    .text(invoice.shipping.address, 300, customerInformationTop + 15)
-                    .font("Helvetica")
-                    .text(invoice.shipping.email, 300, customerInformationTop + 30)
-                    .moveDown();
-
-                generateHr(doc, 252);
-            }
-
-            function generateInvoiceTable(doc, invoice) {
-                let i;
-                const invoiceTableTop = 260;
-
-                // tabla de la factura empieza aqui
-
-                doc.font("Helvetica-Bold");
-                generateTableRow(
-                    doc,
-                    invoiceTableTop,
-                    "Item",
-                    "Description",
-                    "Unit Cost",
-                    "Quantity",
-                    "Line Total"
-                );
-                generateHr(doc, invoiceTableTop + 10);
-                doc.font("Helvetica");
-                //Aqui imprime los items uno a uno.. 
-
-                for (i = 0; i < invoice.items.length; i++) {
-                    const item = invoice.items[i];
-                    const position = invoiceTableTop + (i + 1) * 20;
-                    generateTableRow(
-                        doc,
-                        position,
-                        item.item,
-                        item.description,
-                        formatCurrency(item.amount / item.quantity),
-                        item.quantity,
-                        formatCurrency(item.amount)
-                    );
-
-                }
-
-                let subtotalPosition = invoiceTableTop + (i + 1) * 20;
-                generateHr(doc, subtotalPosition);
-                subtotalPosition = 5 + (invoiceTableTop + (i + 1) * 20);
-
-                generateTableRow(
-                    doc,
-                    subtotalPosition,
-                    "",
-                    "",
-                    "Subtotal",
-                    "",
-                    formatCurrency(invoice.subtotal)
-                );
-
-                const paidToDatePosition = subtotalPosition + 20;
-                generateTableRow(
-                    doc,
-                    paidToDatePosition,
-                    "",
-                    "",
-                    "Paid To Date",
-                    "",
-                    formatCurrency(invoice.paid)
-                );
-
-                const duePosition = paidToDatePosition + 25;
-                doc.font("Helvetica-Bold");
-                generateTableRow(
-                    doc,
-                    duePosition,
-                    "",
-                    "",
-                    "Balance Due",
-                    "",
-                    formatCurrency(invoice.subtotal - invoice.paid)
-                );
-                doc.font("Helvetica");
-            }
-
-            function generateFooter(doc) {
-                doc
-                    .fontSize(10)
-                    .text(
-                        "Payment is due within 15 days. Thank you for your business.",
-                        50,
-                        780,
-                        { align: "center", width: 500 }
-                    );
-            }
-
-            function generateTableRow(
-                doc,
-                y,
-                item,
-                description,
-                unitCost,
-                quantity,
-                lineTotal
-            ) {
-                doc
-                    .fontSize(10)
-                    .text(item, 50, y)
-                    .text(description, 150, y)
-                    .text(unitCost, 280, y, { width: 90, align: "right" })
-                    .text(quantity, 370, y, { width: 90, align: "right" })
-                    .text(lineTotal, 0, y, { align: "right" });
-            }
-
-            function generateHr(doc, y) {
-                doc
-                    .strokeColor("#aaaaaa")
-                    .lineWidth(1)
-                    .moveTo(50, y)
-                    .lineTo(550, y)
-                    .stroke();
-            }
-
-            function formatCurrency(cents) {
-                return "$" + (cents / 100).toFixed(2);
-            }
-
-            function formatDate(date) {
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                const year = date.getFullYear();
-
-                return year + "/" + month + "/" + day;
-            }
-
             return {
                 statusCode: 200,
-
-                // // more keys you can return:
-                // headers: { "headerName": "headerValue", ... },
-                // isBase64Encoded: true,
             }
         } catch (error) {
             return { statusCode: 500, body: error.toString() }
