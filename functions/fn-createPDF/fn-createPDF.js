@@ -23,8 +23,8 @@ exports.handler = async (event, context) => {
         try {
             let newBody1 = JSON.parse(event.body)
 
-            let path2 = path.resolve('./utils/invoice.pdf')
-            createInvoice(newBody1, path2)
+
+            createInvoice(newBody1)
 
             function generateLinesProducts(items) {
                 let i = 0, len = items.length, line = '', aux = [], aux2 = [], aux3 = [], aux4 = [], aux5 = []
