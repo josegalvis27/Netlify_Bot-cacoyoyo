@@ -9,7 +9,7 @@ var transporter = nodemailer.createTransport(
         port: 465,
         secure: false,
         auth: {
-            type:'OAuth2'
+            type:'OAuth2',
             user: "todomarketbot@gmail.com",
             pass: "znplaozomwazbydh"
         }
